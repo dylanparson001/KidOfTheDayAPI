@@ -1,0 +1,6 @@
+@KidOfTheDayAPI_HostAddress = http://localhost:5033
+
+GET {{KidOfTheDayAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
