@@ -103,7 +103,7 @@ namespace KidOfTheDayAPI.Auth
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
             var token = new JwtSecurityToken(_config["Jwt:ValidIssuer"],
-                _config["Jwt:Issuer"],
+                _config["Jwt:ValidAudience"],
                 claims,
                 expires: DateTime.Now.AddHours(8),
                 signingCredentials: credentials

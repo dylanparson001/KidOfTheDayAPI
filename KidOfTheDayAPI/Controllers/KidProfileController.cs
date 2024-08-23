@@ -1,6 +1,7 @@
 ﻿using KidOfTheDayAPI.Dtos;
 using KidOfTheDayAPI.Interfaces;
 using KidOfTheDayAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace KidOfTheDayAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class KidProfileController : ControllerBase
     {
         private readonly IKidProfileRepository _kidProfileRepository;
@@ -40,6 +42,34 @@ namespace KidOfTheDayAPI.Controllers
             var result = await _kidProfileRepository.GetKidsByUser(userId);
 
             return Ok(result);
+        }
+
+        [HttpPut]
+        [Route("updatekidschedule")]
+        public async Task<ActionResult> UpdateKidProfile(int id, int schedule)
+        {
+            if (id == 0 || id < 0)
+            {
+                return BadRequest("Valid Id not sent");
+            }
+
+            if (schedule < 0) 
+            {
+                return BadRequest("Schedule cannot be lower than 0");
+            }
+
+            var kidProfile = await _kidProfileRepository.GetKidProfileById(id);
+
+            if (kidProfile == null)
+            {
+                return BadRequest("Kid profile does not exist");
+            }
+
+
+            await _kidProfileRepository.UpdateKidProfile(id, schedule);
+
+            return NoContent();
+
         }
     }
 }

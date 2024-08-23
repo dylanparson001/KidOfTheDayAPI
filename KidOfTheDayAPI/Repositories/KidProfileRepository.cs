@@ -35,10 +35,53 @@ namespace KidOfTheDayAPI.Repositories
 
                 await conn.OpenAsync();
 
-                reader =  await command.ExecuteReaderAsync();
+                await command.ExecuteNonQueryAsync();
 
                 await conn.CloseAsync();
             }
+        }
+
+        public async Task<KidProfile> GetKidProfileById(int id)
+        {
+            KidProfile profile = new KidProfile();
+
+            var connectionString = _config.GetConnectionString("DefaultConnection");
+            var query = "SELECT Id, UserId, FirstName, LastName, Schedule " +
+                $"FROM KidProfiles WHERE Id = {id}";
+
+            SqlConnection connection = new SqlConnection(connectionString);
+            using (var conn = connection)
+            {
+                var command = new SqlCommand(query, conn);
+                await conn.OpenAsync();
+
+                reader = await command.ExecuteReaderAsync();
+
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        var Id = (int)reader["Id"];
+                        var firstName = reader["FirstName"].ToString();
+                        var lastName = reader["LastName"].ToString();
+                        var schedule = (int)reader["Schedule"];
+                        var user = (int)reader["UserId"];
+
+                        profile = new KidProfile(
+                            Id,
+                            user,
+                            firstName,
+                            lastName,
+                            schedule
+                            );
+
+
+
+                    }
+                }
+                await conn.CloseAsync();
+            }
+            return profile;
         }
 
         public async Task<List<KidProfile>> GetKidsByUser(int userId)
@@ -83,6 +126,26 @@ namespace KidOfTheDayAPI.Repositories
                 await conn.CloseAsync();
             }
             return profiles;
+        }
+
+        public async Task UpdateKidProfile(int id, int schedule)
+        {
+            var connectionString = _config.GetConnectionString("DefaultConnection");
+            SqlConnection connection = new SqlConnection(connectionString);
+
+            using (var conn = connection)
+            using(var command = new SqlCommand("SpUpdateKidProfileSchedule", conn))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+
+                command.Parameters.AddWithValue("@Id", id);
+                command.Parameters.AddWithValue("@Schedule", schedule);
+                await conn.OpenAsync();
+
+                await command.ExecuteNonQueryAsync();
+
+                await conn.CloseAsync();
+            }
         }
     }
 }
