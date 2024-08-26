@@ -9,7 +9,7 @@ namespace KidOfTheDayAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class KidProfileController : ControllerBase
     {
         private readonly IKidProfileRepository _kidProfileRepository;
@@ -41,6 +41,31 @@ namespace KidOfTheDayAPI.Controllers
         {
             var result = await _kidProfileRepository.GetKidsByUser(userId);
 
+            if (result == null) 
+            {
+                return NoContent();
+            }
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("getkidbyid")]
+        public async Task<ActionResult<KidProfile>> GetKidById(int id)
+        {
+
+            if (id == 0 || id < 0)
+            {
+                return BadRequest("Valid kid not provided");
+
+            }
+            var result = await _kidProfileRepository.GetKidProfileById(id);
+
+            if (result == null )
+            {
+                return NoContent();
+            }
+
             return Ok(result);
         }
 
@@ -71,5 +96,15 @@ namespace KidOfTheDayAPI.Controllers
             return NoContent();
 
         }
+
+        [HttpDelete]
+        [Route("deletekidprofile")]
+        public async Task<IActionResult> DeleteKidProfile(int kidId)
+        {
+            await _kidProfileRepository.DeleteKidProfile(kidId);
+
+            return NoContent();
+        }
+
     }
 }

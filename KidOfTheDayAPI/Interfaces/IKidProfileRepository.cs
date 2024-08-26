@@ -9,5 +9,6 @@ namespace KidOfTheDayAPI.Interfaces
         public Task AddKidProfile(KidProfileDto profile);
         public Task UpdateKidProfile(int id, int schedule);
         public Task<KidProfile> GetKidProfileById(int id);
+        public Task DeleteKidProfile(int id);
     }
 }

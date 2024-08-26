@@ -41,13 +41,31 @@ namespace KidOfTheDayAPI.Repositories
             }
         }
 
+        public async Task DeleteKidProfile(int kidId)
+        {
+            var connectionString = _config.GetConnectionString("DefaultConnection");
+            string query = $"DELETE FROM KidProfiles WHERE Id = {kidId}";
+
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var command = new SqlCommand(query, connection);
+
+                await connection.OpenAsync();
+
+                await command.ExecuteNonQueryAsync();   
+
+                await connection.CloseAsync();
+            }
+        }
+
         public async Task<KidProfile> GetKidProfileById(int id)
         {
             KidProfile profile = new KidProfile();
 
             var connectionString = _config.GetConnectionString("DefaultConnection");
             var query = "SELECT Id, UserId, FirstName, LastName, Schedule " +
-                $"FROM KidProfiles WHERE Id = {id}";
+                        $"FROM KidProfiles WHERE Id = {id}";
 
             SqlConnection connection = new SqlConnection(connectionString);
             using (var conn = connection)
@@ -67,15 +85,7 @@ namespace KidOfTheDayAPI.Repositories
                         var schedule = (int)reader["Schedule"];
                         var user = (int)reader["UserId"];
 
-                        profile = new KidProfile(
-                            Id,
-                            user,
-                            firstName,
-                            lastName,
-                            schedule
-                            );
-
-
+                        profile = new KidProfile(Id, user, firstName, lastName, schedule);
 
                     }
                 }
@@ -90,7 +100,7 @@ namespace KidOfTheDayAPI.Repositories
 
             var connectionString = _config.GetConnectionString("DefaultConnection");
             var query = "SELECT Id, UserId, FirstName, LastName, Schedule " +
-                $"FROM KidProfiles WHERE UserId = {userId}";
+                        $"FROM KidProfiles WHERE UserId = {userId}";
 
             SqlConnection connection = new SqlConnection(connectionString);
             using (var conn = connection)
@@ -147,5 +157,7 @@ namespace KidOfTheDayAPI.Repositories
                 await conn.CloseAsync();
             }
         }
+
+        
     }
 }

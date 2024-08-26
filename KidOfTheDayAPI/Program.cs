@@ -14,6 +14,7 @@ var configuration = builder.Configuration;
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IKidProfileRepository, KidProfileRepository>();
+builder.Services.AddScoped<IResponsibiltiesRepository, ResponsibilitiesRepository>();
 
 // Identtiy
 //builder.Services.AddIdentity<User, IdentityRole>()
@@ -37,6 +38,7 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = configuration["JWT:ValidAudience"],
             ValidIssuer = configuration["JWT:ValidIssuer"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]!))
+
 
         };
     });
