@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using KidOfTheDayAPI.Dtos;
 using BC = BCrypt.Net.BCrypt;
 
 
@@ -21,7 +22,7 @@ namespace KidOfTheDayAPI.Auth
         public AuthController(
             IConfiguration config,
             IUserRepository userRepository
-            )
+        )
         {
             _config = config;
             _userRepository = userRepository;
@@ -30,20 +31,27 @@ namespace KidOfTheDayAPI.Auth
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto login)
+        public async Task<ActionResult<UserDto>> Login([FromBody] LoginDto login)
         {
-            IActionResult response = Unauthorized();
+            User user = await AuthenticateUser(login);
 
-            var user = await AuthenticateUser(login);
-
-            if (user != null)
+            if (user == null)
             {
-                var token = GenerateJSONWebToken(user);
-                response = Ok(new { token });
+                return Unauthorized();
             }
 
-            return response;
-
+            var token = GenerateJSONWebToken(user);
+            UserDto userDto = new UserDto()
+            {
+                Id = user.Id,
+                Username = user.Username,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                EmailAddress = user.EmailAddress,
+                Role = user.Role,
+                Token = token
+            };
+            return Ok(userDto);
         }
 
         [HttpPost]
@@ -60,7 +68,8 @@ namespace KidOfTheDayAPI.Auth
 
             var passwordHash = BC.EnhancedHashPassword(register.Password, 13);
 
-            await _userRepository.RegisterUser(register.Username, passwordHash, register.EmailAddress, register.FirstName, register.LastNAme);
+            await _userRepository.RegisterUser(register.Username, passwordHash, register.EmailAddress,
+                register.FirstName, register.LastName, register.Role);
 
             return Ok();
         }
@@ -76,10 +85,11 @@ namespace KidOfTheDayAPI.Auth
 
             var password = login.Password;
 
-            if (password == null)
+            if (string.IsNullOrEmpty((password)))
             {
                 return null;
             }
+
             User user = await _userRepository.GetUserByUsername(login.Username);
 
             if (BC.EnhancedVerify(password, user.PasswordHash))
@@ -87,8 +97,7 @@ namespace KidOfTheDayAPI.Auth
                 return user;
             }
 
-            return user;
-
+            return null;
         }
 
         private object GenerateJSONWebToken(User userInfo)
@@ -107,7 +116,7 @@ namespace KidOfTheDayAPI.Auth
                 claims,
                 expires: DateTime.Now.AddHours(8),
                 signingCredentials: credentials
-                );
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

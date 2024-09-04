@@ -44,7 +44,7 @@ namespace KidOfTheDayAPI.Repositories
         public async Task DeleteKidProfile(int kidId)
         {
             var connectionString = _config.GetConnectionString("DefaultConnection");
-            string query = $"DELETE FROM KidProfiles WHERE Id = {kidId}";
+            string query = $"DELETE FROM KidProfiles WHERE Id = @KidId";
 
 
             using (var connection = new SqlConnection(connectionString))
@@ -52,7 +52,7 @@ namespace KidOfTheDayAPI.Repositories
                 var command = new SqlCommand(query, connection);
 
                 await connection.OpenAsync();
-
+                command.Parameters.AddWithValue("@KidId", kidId);
                 await command.ExecuteNonQueryAsync();   
 
                 await connection.CloseAsync();
@@ -65,13 +65,14 @@ namespace KidOfTheDayAPI.Repositories
 
             var connectionString = _config.GetConnectionString("DefaultConnection");
             var query = "SELECT Id, UserId, FirstName, LastName, Schedule " +
-                        $"FROM KidProfiles WHERE Id = {id}";
+                        $"FROM KidProfiles WHERE Id = @Id";
 
             SqlConnection connection = new SqlConnection(connectionString);
             using (var conn = connection)
             {
                 var command = new SqlCommand(query, conn);
                 await conn.OpenAsync();
+                command.Parameters.AddWithValue("@Id", id);
 
                 reader = await command.ExecuteReaderAsync();
 
@@ -100,13 +101,14 @@ namespace KidOfTheDayAPI.Repositories
 
             var connectionString = _config.GetConnectionString("DefaultConnection");
             var query = "SELECT Id, UserId, FirstName, LastName, Schedule " +
-                        $"FROM KidProfiles WHERE UserId = {userId}";
+                        $"FROM KidProfiles WHERE UserId = @UserId";
 
             SqlConnection connection = new SqlConnection(connectionString);
             using (var conn = connection)
             {
                 var command = new SqlCommand(query, conn);
                 await conn.OpenAsync();
+                command.Parameters.AddWithValue("@UserId", userId);
 
                 reader = await command.ExecuteReaderAsync();
 

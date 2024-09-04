@@ -7,6 +7,6 @@ namespace KidOfTheDayAPI.Interfaces
     {
         public Task<User> GetUserByUsernameAndPassword(string username, string password);
         public Task<User> GetUserByUsername(string username);
-        public Task RegisterUser(string username, string password, string email, string firstName, string lastName);
+        public Task RegisterUser(string username, string password, string email, string firstName, string lastName, string role);
     }
 }

@@ -10,16 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Add services to the container.
-//builder.Services.AddDbContext<DataContext>(options => options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IKidProfileRepository, KidProfileRepository>();
 builder.Services.AddScoped<IResponsibiltiesRepository, ResponsibilitiesRepository>();
 
 // Identtiy
-//builder.Services.AddIdentity<User, IdentityRole>()
-//    .AddDefaultTokenProviders();
-
 // Auth
 builder.Services.AddAuthentication(options =>
 {
@@ -54,8 +49,9 @@ var app = builder.Build();
 
 app.UseCors(options =>
 {
-    options.AllowAnyHeader();
-    options.AllowAnyMethod();
+    options.AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin();
 });
 
 // Configure the HTTP request pipeline.

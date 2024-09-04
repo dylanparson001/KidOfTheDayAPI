@@ -50,7 +50,7 @@ namespace KidOfTheDayAPI.Controllers
         [Route("deleteresponsibility")]
         public async Task<ActionResult> DeleteResponsibility(int id)
         {
-            if (_responsibiltiesRepository == null)
+            if (id == 0 || id < 0)
             {
                 return BadRequest("Not a valid responisbility");
             }

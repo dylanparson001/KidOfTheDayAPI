@@ -46,6 +46,7 @@ namespace KidOfTheDayAPI.Repositories
                         var firstName = reader["FirstName"].ToString();
                         var lastName = reader["LastName"].ToString();
                         var emailAddress = reader["EmailAddress"].ToString();
+                        var role = reader["Role"].ToString();
 
                         user = new User(
                                 id: id,
@@ -53,7 +54,8 @@ namespace KidOfTheDayAPI.Repositories
                                 passwordHash: passwordHash,
                                 firstName: firstName,
                                 lastName: lastName,
-                                emailAddress: emailAddress
+                                emailAddress: emailAddress,
+                                role: role
                             );
                     }
                 }
@@ -68,14 +70,15 @@ namespace KidOfTheDayAPI.Repositories
         {
             User user = null;
             var connectionString = _config.GetConnectionString("DefaultConnection");
-            var query = "SELECT * FROM Users WHERE Username = @Username";
+            var query = "SELECT Id, Username, PasswordHash, FirstName, EmailAddress, LastName, Role " +
+                        "FROM Users WHERE Username = @Username";
            
            
             SqlConnection connection = new SqlConnection(connectionString);
            
             using (var conn = connection)
             {
-                conn.Open();
+                await conn.OpenAsync();
                 SqlCommand command = new SqlCommand(query, conn);
 
                 command.Parameters.AddWithValue("@Username", username);
@@ -92,25 +95,27 @@ namespace KidOfTheDayAPI.Repositories
                         var firstName = reader["FirstName"].ToString();
                         var lastName = reader["LastName"].ToString();
                         var emailAddress = reader["EmailAddress"].ToString();
+                        var role = reader["Role"].ToString();
 
-                        user = new User (
+                            user = new User(
                                 id: id,
                                 username: userName,
                                 passwordHash: passwordHash,
                                 firstName: firstName,
                                 lastName: lastName,
-                                emailAddress: emailAddress
+                                emailAddress: emailAddress,
+                                role: role
                             );
                     }
                 }
 
-                conn.Close();
+                await conn.CloseAsync();
             }
 
             return user;
         }
 
-        public async Task RegisterUser(string username, string password, string email, string firstName, string lastName)
+        public async Task RegisterUser(string username, string password, string email, string firstName, string lastName, string role)
         {
             //User user = null;
             var connectionString = _config.GetConnectionString("DefaultConnection");
@@ -130,6 +135,7 @@ namespace KidOfTheDayAPI.Repositories
                 command.Parameters.AddWithValue("@Email", email);
                 command.Parameters.AddWithValue("@FirstName", firstName);
                 command.Parameters.AddWithValue("@LastName", lastName);
+                command.Parameters.AddWithValue("@Role", role);
 
                 await conn.OpenAsync();
 

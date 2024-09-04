@@ -8,7 +8,7 @@ namespace KidOfTheDayAPI.Models
         {
         }
 
-        public User(int id, string username, string firstName, string lastName, string passwordHash, string emailAddress)
+        public User(int id, string username, string firstName, string lastName, string passwordHash, string emailAddress, string role)
         {
             Id = id;
             Username = username;
@@ -16,6 +16,7 @@ namespace KidOfTheDayAPI.Models
             LastName = lastName;
             PasswordHash = passwordHash;
             EmailAddress = emailAddress;
+            Role = Role;
         }
 
         public int Id { get; set; }
@@ -24,5 +25,6 @@ namespace KidOfTheDayAPI.Models
         public string LastName { get; set; }
         public string PasswordHash { get; set; }
         public string EmailAddress { get; set; }
+        public string Role { get; set; }
     }
 }
